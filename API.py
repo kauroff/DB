@@ -35,4 +35,3 @@ class API:
                 break
             self.params['page'] += 1
         return self.data
-
