@@ -39,3 +39,5 @@ class API:
 
 hh = API()
 print(hh.load_vacancies())
+
+апр
