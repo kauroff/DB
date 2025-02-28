@@ -7,7 +7,7 @@ class API:
     """
     BASE_URL = 'https://api.hh.ru/vacancies'
 
-    # EMPLOYER_URL = 'https://api.hh.ru/employers'
+    EMPLOYER_URL = 'https://api.hh.ru/employers'
 
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'HH-User-Agent'}
@@ -22,11 +22,11 @@ class API:
         # self.params['employer_id'] = employer_id
         self.params['page'] = 0
 
-        response = requests.get(self.BASE_URL, headers=self.headers, params=self.params)
+        response = requests.get(self.EMPLOYER_URL, headers=self.headers, params=self.params)
         self.data = response.json()['items']
 
         while True:
-            response = requests.get(self.BASE_URL, headers=self.headers, params=self.params)
+            response = requests.get(self.EMPLOYER_URL, headers=self.headers, params=self.params)
             data = response.json()
             vacancies = data['items']
             self.data.extend(vacancies)
