@@ -1,41 +1,34 @@
 import requests
 
 
-class API:
+class HeadHunterAPI:
     """
-    Класс для работы с API хэдхантера
+    Класс для работы с API HeadHunter
     """
-    BASE_URL = 'https://api.hh.ru/vacancies'
-
-    EMPLOYER_URL = 'https://api.hh.ru/employers'
 
     def __init__(self) -> None:
+        """
+        Метод инициализации для запроса по API
+        """
+        self.url = 'https://api.hh.ru/vacancies'
         self.headers = {'User-Agent': 'HH-User-Agent'}
-        self.params = {
-            'per_page': 100,
-            'page': 0,
-            'only_with_salary': True
-        }
-        self.data = []
+        self.params = {'text': '', 'page': 0, 'per_page': 100}
+        self.vacancies = []
 
-    def load_vacancies(self) -> None:
-        # self.params['employer_id'] = employer_id
-        self.params['page'] = 0
-        #
-        # response = requests.get(self.EMPLOYER_URL, headers=self.headers, params=self.params)
-        # self.data = response.json()['items']
-
-        # while self.params.get('page') != 50:
-
-        while True:
-            response = requests.get(self.EMPLOYER_URL, headers=self.headers, params=self.params)
-            data = response.json()['items']
-            print(data)
-            self.data.extend(data)
+    def get_vacancies(self, keyword) -> list:
+        """
+        Получение вакансий с hh.ru
+        :param keyword: ключевое слово
+        :return: Список словарей с вакансиями
+        """
+        self.params['text'] = keyword
+        while self.params.get('page') != 20:
+            response = requests.get(self.url, headers=self.headers, params=self.params)
+            vacancies = response.json()['items']
+            self.vacancies.extend(vacancies)
             self.params['page'] += 1
+        return self.vacancies
 
-        # return self.data
 
-
-hh = API()
-print(hh.load_vacancies())
+hh = HeadHunterAPI()
+print(hh.get_vacancies('python'))
