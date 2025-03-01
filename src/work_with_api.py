@@ -6,11 +6,6 @@ class API:
     """
     Класс для работы с API хэдхантера
     """
-    BASE_URL = 'https://api.hh.ru/vacancies'
-
-    EMPLOYER_URL = 'https://api.hh.ru/employers'
-
-    # https: // api.hh.ru / vacancies?employer_id = 3529
 
     def __init__(self) -> None:
         self.headers = {'User-Agent': 'HH-User-Agent'}
@@ -23,7 +18,7 @@ class API:
         self.ids_data = self.get_ids()
 
     def get_ids(self):
-        with open('../data/ids.json') as f:
+        with open('../data/employer_ids.json') as f:
             self.ids_data = json.load(f)['id']
         return self.ids_data
 
