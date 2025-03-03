@@ -5,8 +5,8 @@ if __name__ == '__main__':
 
     hh = API()
     data = hh.load_vacancies()
-    # database = DBManager('db')  # можно назвать бд
-    # database.create_tables()
+    database = DBManager('db')  # можно назвать бд
+    database.create_tables()
     emp = [data[i][0]['employer']['name'] for i in range(len(data))]
     for element in emp:
         print(element)

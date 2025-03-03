@@ -4,22 +4,21 @@ from data.config import config
 
 
 class DBManager(ABSManager):
-    def __init__(self, name, **params):
+    def __init__(self, name):
         """
         Создание базы данных
         :params name, :
-        :params **params:
         :return:
         """
         self.name = name
         self.employer_id = ''
         self.params = config()
 
-        conn = psycopg2.connect(dbname=self.name, **self.params)
+        conn = psycopg2.connect(dbname='postgres', **self.params)
         conn.autocommit = True
         cur = conn.cursor()
 
-        cur.execute(f'DROP DATABASE {self.name}')
+        cur.execute(f'DROP DATABASE IF EXISTS {self.name}')
         cur.execute(f'CREATE DATABASE {self.name}')
 
         cur.close()
@@ -29,18 +28,18 @@ class DBManager(ABSManager):
         conn = psycopg2.connect(dbname=self.name, **self.params)
         with conn.cursor() as cur:
             cur.execute("""
+            CREATE TABLE employers (
+            employer_id SERIAL PRIMARY KEY,
+            title VARCHAR(50) NOT NULL,
+            count_vacancies INTEGER,
+            emp_url TEXT    
+            );
             CREATE TABLE vacancies (
             vacancy_id SERIAL PRIMARY KEY,
             title VARCHAR NOT NULL,
             company_id INTEGER REFERENCES employers(employer_id),
             salary INTEGER,
             vacancy_url TEXT    
-            );
-            CREATE TABLE employers (
-            employer_id SERIAL PRIMARY KEY,
-            title VARCHAR(50) NOT NULL,
-            count_vacancies INTEGER,
-            emp_url TEXT    
             )""")
 
         conn.commit()
