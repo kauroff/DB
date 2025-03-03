@@ -30,7 +30,7 @@ class DBManager(ABSManager):
             cur.execute("""
             CREATE TABLE employers (
             employer_id SERIAL PRIMARY KEY,
-            title VARCHAR(50) NOT NULL,
+            company_name VARCHAR(50) NOT NULL,
             count_vacancies INTEGER,
             emp_url TEXT    
             );
@@ -45,66 +45,80 @@ class DBManager(ABSManager):
         conn.commit()
         conn.close()
 
-    def save_employers_to_database(self, data: list[dict]) -> str:
+    def save_employers_to_database(self, company_name, count, url) -> None:
         """
         Сохранение данных в бах данных
-        :param data:
+        :param company_name:
+        :param count:
+        :param url:
         :return:
         """
 
         conn = psycopg2.connect(dbname=self.name, **self.params)
         with conn.cursor() as cur:
-            for emp in data:
-                cur.execute("""
-                            INSERT INTO employers (
-                            employer_id, title, count_vacancies, emp_url)
-                            VALUES (%s, %s, %s, %s)
-                            RETURNING employer_id
-                            """,
-                            (emp['id'], emp['title'], emp['count'], emp['url'])
-                            )
-        self.employer_id = cur.fetchone()[0]
+            cur.execute("""
+                        INSERT INTO employers (
+                        company_name, count_vacancies, emp_url)
+                        VALUES (%s, %s, %s)
+                        RETURNING employer_id
+                        """,
+                        (company_name, count, url)
+                        )
+            self.employer_id = cur.fetchone()[0]
         conn.commit()
         conn.close()
-        return self.employer_id
 
-    def save_vacancies_to_database(self, data: list[dict]) -> None:
+    def save_vacancies_to_database(self, title, salary, url) -> None:
         """
         Сохранение данных в бах данных
-        :param data:
-        :param params:
+        :param title:
+        :param salary:
+        :param url:
         :return:
         """
 
         conn = psycopg2.connect(dbname=self.name, **self.params)
         with conn.cursor() as cur:
-            for vac in data:
-                cur.execute("""
-                                    INSERT INTO vacancies (
-                                    vacancy_id, title, company_id, salary, vacancy_url)
-                                    VALUES (%s, %s, %s, %s, %s)
-                                    """,
-                            (vac['id'], vac['title'], self.employer_id, vac['sal'], vac['url'])
-                            )
+            cur.execute("""
+                                INSERT INTO vacancies (
+                                title, company_id, salary, vacancy_url)
+                                VALUES (%s, %s, %s, %s)
+                                """,
+                        (title, self.employer_id, salary, url)
+                        )
         conn.commit()
         conn.close()
 
+    def get_companies_and_vacancies_count(self):
+        conn = psycopg2.connect(dbname=self.name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute("""
+                        SELECT company_name, count_vacancies FROM employers
+                        """
+                        )
+            data = cur.fetchall()[0]
+        conn.commit()
+        conn.close()
+        return data
 
-def get_companies_and_vacancies_count(self):
-    pass
+    def get_all_vacancies(self):
+        conn = psycopg2.connect(dbname=self.name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute("""
+                        SELECT company_name, title, salary, vacancy_url FROM vacancies
+                        LEFT JOIN employers ON vacancies.company_id=employers.employer_id
+                        """
+                        )
+            data = cur.fetchall()
+        conn.commit()
+        conn.close()
+        return data
 
+    def get_avg_salary(self):
+        pass
 
-def get_all_vacancies(self):
-    pass
+    def get_vacancies_with_higher_salary(self):
+        pass
 
-
-def get_avg_salary(self):
-    pass
-
-
-def get_vacancies_with_higher_salary(self):
-    pass
-
-
-def get_vacancies_with_keyword(self):
-    pass
+    def get_vacancies_with_keyword(self):
+        pass
