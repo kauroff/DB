@@ -15,21 +15,17 @@ class API:
             'only_with_salary': True
         }
         self.vacancies_data = []
-        self.ids_data = self.get_ids()
+        self.ids_data = self.__get_ids()
 
-    def get_ids(self):
-        with open('../data/employer_ids.json') as f:
-            self.ids_data = json.load(f)['id']
+    def __get_ids(self) -> list:
+        with open('data/employer_ids.json') as file:
+            self.ids_data = json.load(file)['id']
         return self.ids_data
 
-    def load_vacancies(self) -> None:
+    def load_vacancies(self) -> list:
         for unit in self.ids_data:
             url = f'https://api.hh.ru/vacancies?employer_id={unit}'
             response = requests.get(url, headers=self.headers, params=self.params)
             data = response.json()['items']
-            print(data)
-            self.vacancies_data.extend(data)
-
-
-hh = API()
-print(hh.load_vacancies())
+            self.vacancies_data.append(data)
+        return self.vacancies_data
