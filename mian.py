@@ -20,6 +20,27 @@ if __name__ == '__main__':
                 salary = vacancy['salary']['to']
             url = vacancy['alternate_url']
             database.save_vacancies_to_database(title, salary, url)
-
-    database.get_companies_and_vacancies_count()
-    print(database.get_all_vacancies())
+    while True:
+        answer = input('''
+Введите:
+AE - если хотите получить список всех компаний и количество вакансий у каждой компании
+AV - если хотите получить список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на вакансию
+AS - если хотите получить среднюю зарплату по вакансиям
+HS - если хотите получить список всех вакансий, у которых зарплата выше средней по всем вакансиям
+KV - если хотите получить список всех вакансий, в названии которых содержатся переданные в метод слова, например python
+Q - если хотите выйти
+''')
+        if answer == 'AE':
+            print(database.get_companies_and_vacancies_count)
+        elif answer == 'AV':
+            print(database.get_all_vacancies)
+        elif answer == 'AS':
+            print(database.get_avg_salary)
+        elif answer == 'HS':
+            print(database.get_vacancies_with_higher_salary)
+        elif answer == 'KV':
+            print(database.get_vacancies_with_keyword)
+        elif answer == 'Q':
+            break
+        else:
+            print('Нет такой команды, попробуйте еще раз')

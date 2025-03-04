@@ -1,14 +1,14 @@
 import psycopg2
-from src.abc_dbm import ABSManager
+from abc_dbm import ABCManager
 from data.config import config
 
 
-class DBManager(ABSManager):
-    def __init__(self, name):
+class DBManager(ABCManager):
+    def __init__(self, name) -> None:
         """
         Создание базы данных
-        :params name, :
-        :return:
+        :params name: Название базы данных
+        :return: None
         """
         self.name = name
         self.employer_id = ''
@@ -25,6 +25,10 @@ class DBManager(ABSManager):
         conn.close()
 
     def create_tables(self) -> None:
+        """
+        Создает таблицы в созданной базе данных
+        :return: None
+        """
         conn = psycopg2.connect(dbname=self.name, **self.params)
         with conn.cursor() as cur:
             cur.execute("""
@@ -45,13 +49,13 @@ class DBManager(ABSManager):
         conn.commit()
         conn.close()
 
-    def save_employers_to_database(self, company_name, count, url) -> None:
+    def save_employers_to_database(self, company_name: str, count: int, url: str) -> None:
         """
         Сохранение данных в бах данных
-        :param company_name:
-        :param count:
-        :param url:
-        :return:
+        :param company_name: Название компании
+        :param count: Количество вакансий у компании
+        :param url: Ссылка на работодателя
+        :return: None
         """
 
         conn = psycopg2.connect(dbname=self.name, **self.params)
@@ -68,13 +72,13 @@ class DBManager(ABSManager):
         conn.commit()
         conn.close()
 
-    def save_vacancies_to_database(self, title, salary, url) -> None:
+    def save_vacancies_to_database(self, title: str, salary: int, url: str) -> None:
         """
         Сохранение данных в бах данных
-        :param title:
-        :param salary:
-        :param url:
-        :return:
+        :param title: Название вакансии
+        :param salary: Заработная плата
+        :param url: Ссылка на вакансию
+        :return: None
         """
 
         conn = psycopg2.connect(dbname=self.name, **self.params)
@@ -89,7 +93,11 @@ class DBManager(ABSManager):
         conn.commit()
         conn.close()
 
-    def get_companies_and_vacancies_count(self):
+    def get_companies_and_vacancies_count(self) -> tuple:
+        """
+        Получает список всех компаний и количество вакансий у каждой компании
+        :return: Кортеж компаний и количество вакансий у каждой компании
+        """
         conn = psycopg2.connect(dbname=self.name, **self.params)
         with conn.cursor() as cur:
             cur.execute("""
@@ -101,7 +109,11 @@ class DBManager(ABSManager):
         conn.close()
         return data
 
-    def get_all_vacancies(self):
+    def get_all_vacancies(self) -> list:
+        """
+        Получает список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на вакансию
+        :return: Список вакансий
+        """
         conn = psycopg2.connect(dbname=self.name, **self.params)
         with conn.cursor() as cur:
             cur.execute("""
@@ -114,11 +126,52 @@ class DBManager(ABSManager):
         conn.close()
         return data
 
-    def get_avg_salary(self):
-        pass
+    def get_avg_salary(self) -> float:
+        """
+        Получает среднюю зарплату по вакансиям
+        :return: Средняя зарплата
+        """
+        conn = psycopg2.connect(dbname=self.name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute("""
+                        SELECT AVG(salary) FROM vacancies
+                        """
+                        )
+            salary = cur.fetchall()[0][0]
+        conn.commit()
+        conn.close()
+        return salary
 
-    def get_vacancies_with_higher_salary(self):
-        pass
+    def get_vacancies_with_higher_salary(self) -> list:
+        """
+        Получает список всех вакансий, у которых зарплата выше средней по всем вакансиям
+        :return: Список вакансий
+        """
+        conn = psycopg2.connect(dbname=self.name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute("""
+                                SELECT title, company_id, salary, vacancy_url FROM vacancies
+                                WHERE salary > (SELECT AVG(salary) FROM vacancies)
+                                """
+                        )
+            data = cur.fetchall()
+        conn.commit()
+        conn.close()
+        return data
 
-    def get_vacancies_with_keyword(self):
-        pass
+    def get_vacancies_with_keyword(self, word: str) -> list:
+        """
+        Получает список всех вакансий, в названии которых содержатся переданные в метод слова, например python
+        :return: Список вакансий
+        """
+        conn = psycopg2.connect(dbname=self.name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                        SELECT vacancy_id, title, company_id, salary, vacancy_url FROM vacancies
+                        WHERE title LIKE '%{word}%'  
+                        """
+                        )
+            data = cur.fetchall()
+        conn.commit()
+        conn.close()
+        return data
