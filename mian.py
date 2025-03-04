@@ -21,26 +21,36 @@ if __name__ == '__main__':
             url = vacancy['alternate_url']
             database.save_vacancies_to_database(title, salary, url)
     while True:
-        answer = input('''
+        print('''
 Введите:
 AE - если хотите получить список всех компаний и количество вакансий у каждой компании
-AV - если хотите получить список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на вакансию
+AV - если хотите получить список всех вакансий с указанием названия компании, названия вакансии, зарплаты и ссылки
 AS - если хотите получить среднюю зарплату по вакансиям
-HS - если хотите получить список всех вакансий, у которых зарплата выше средней по всем вакансиям
-KV - если хотите получить список всех вакансий, в названии которых содержатся переданные в метод слова, например python
-Q - если хотите выйти
-''')
-        if answer == 'AE':
-            print(database.get_companies_and_vacancies_count)
-        elif answer == 'AV':
-            print(database.get_all_vacancies)
-        elif answer == 'AS':
-            print(database.get_avg_salary)
-        elif answer == 'HS':
-            print(database.get_vacancies_with_higher_salary)
-        elif answer == 'KV':
-            print(database.get_vacancies_with_keyword)
-        elif answer == 'Q':
+HS - если хотите получить список всех вакансий, у которых зарплата выше средней
+KW - если хотите получить список всех вакансий, в названии которых содержатся переданное слово
+Q - если хотите выйти''')
+        answer = input()
+        if answer.upper() == 'AE':
+            all_employers = database.get_companies_and_vacancies_count()
+            for emp, count in all_employers:
+                print(f'{emp}, количество вакансий: {count}')
+        elif answer.upper() == 'AV':
+            all_vacancies = database.get_all_vacancies()
+            for company, vacancy, salary, url in all_vacancies:
+                print(f'{company}, {vacancy}, {salary} р., {url}')
+        elif answer.upper() == 'AS':
+            salary = database.get_avg_salary()
+            print(f'{round(salary)} р.')
+        elif answer.upper() == 'HS':
+            high_salary = database.get_vacancies_with_higher_salary()
+            for vacancy, salary, url in high_salary:
+                print(f'{vacancy}, {salary} р., {url}')
+        elif answer.upper() == 'KW':
+            word = input('Введите слово для поиска: ')
+            vacancies = database.get_vacancies_with_keyword(word)
+            for vacancy, salary, url in vacancies:
+                print(f'{vacancy}, {salary} р., {url}')
+        elif answer.upper() == 'Q':
             break
         else:
             print('Нет такой команды, попробуйте еще раз')

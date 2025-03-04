@@ -27,7 +27,7 @@ class ABCManager(ABC):
         :return: None
         """
 
-    def get_companies_and_vacancies_count(self) -> tuple:
+    def get_companies_and_vacancies_count(self) -> list:
         """
         Получает список всех компаний и количество вакансий у каждой компании
         :return: Кортеж компаний и количество вакансий у каждой компании
