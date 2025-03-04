@@ -1,9 +1,12 @@
 import psycopg2
-from abc_dbm import ABCManager
+from src.abc_dbm import ABCManager
 from data.config import config
 
 
 class DBManager(ABCManager):
+    """
+    Класс для работы с базой данных
+    """
     def __init__(self, name) -> None:
         """
         Создание базы данных
@@ -93,7 +96,7 @@ class DBManager(ABCManager):
         conn.commit()
         conn.close()
 
-    def get_companies_and_vacancies_count(self) -> tuple:
+    def get_companies_and_vacancies_count(self) -> list:
         """
         Получает список всех компаний и количество вакансий у каждой компании
         :return: Кортеж компаний и количество вакансий у каждой компании
@@ -104,7 +107,7 @@ class DBManager(ABCManager):
                         SELECT company_name, count_vacancies FROM employers
                         """
                         )
-            data = cur.fetchall()[0]
+            data = cur.fetchall()
         conn.commit()
         conn.close()
         return data
@@ -150,7 +153,7 @@ class DBManager(ABCManager):
         conn = psycopg2.connect(dbname=self.name, **self.params)
         with conn.cursor() as cur:
             cur.execute("""
-                                SELECT title, company_id, salary, vacancy_url FROM vacancies
+                                SELECT title, salary, vacancy_url FROM vacancies
                                 WHERE salary > (SELECT AVG(salary) FROM vacancies)
                                 """
                         )
@@ -167,7 +170,7 @@ class DBManager(ABCManager):
         conn = psycopg2.connect(dbname=self.name, **self.params)
         with conn.cursor() as cur:
             cur.execute(f"""
-                        SELECT vacancy_id, title, company_id, salary, vacancy_url FROM vacancies
+                        SELECT title, salary, vacancy_url FROM vacancies
                         WHERE title LIKE '%{word}%'  
                         """
                         )

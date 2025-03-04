@@ -8,6 +8,10 @@ class API:
     """
 
     def __init__(self) -> None:
+        """
+        Метод инициализации
+        :return: None
+        """
         self.headers = {'User-Agent': 'HH-User-Agent'}
         self.params = {
             'per_page': 100,
